@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body>
+    <form>
+      <my-checkbox value="my-checkbox-1" name="checkbox"></my-checkbox>
+      <my-checkbox value="my-checkbox-2" name="checkbox"></my-checkbox>
+      <my-radio value="my-radio-1" name="radio"></my-radio>
+      <my-radio value="my-radio-2" name="radio"></my-radio>
+      <div id="actions">
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+      </div>
+    </form>
+    <hr>
+    <pre><output></output></pre>
+
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      /** Get a reference to the form */
+      const form = document.querySelector('form');
+      /** Get the output element to display form data in */
+      const output = document.querySelector('output');
+
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+
+        const form = event.target;
+
+        /** Get all of the form data */
+        const formData = new FormData(form);
+        const data = {};
+
+        formData.forEach((value, key) => {
+          if (data[key] !== undefined) {
+            // If the key already exists in data, convert its value to an array
+            if (!Array.isArray(data[key])) {
+              data[key] = [data[key]];
+            }
+            data[key].push(value);
+          } else {
+            // If the key doesn't exist in data, assign the value directly
+            data[key] = value;
+          }
+        });
+
+        output.innerHTML = JSON.stringify(data, null, 2);
+      });
+    </script>
+  </body>
+</html>
