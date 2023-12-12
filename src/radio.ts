@@ -1,3 +1,23 @@
+const sharedStyles = new CSSStyleSheet();
+sharedStyles.replaceSync(`
+label {
+    display: inline-block;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border: 2px solid #d0d0d0;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s;
+  }
+  label:hover {
+    background-color: #e0e0e0;
+  }
+  input[type="radio"]:checked + label {
+    background-color: #a0e0a0;
+    border-color: #70c070;
+  }
+`)
+
 class MyRadio extends HTMLElement {
     static formAssociated = true; // Explicitly mark as form-associated
 
@@ -6,7 +26,7 @@ class MyRadio extends HTMLElement {
         this._internals = this.attachInternals();
 
         // Shadow DOM attachment
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         // Internal radio input
         this._input = document.createElement('input');
@@ -22,29 +42,9 @@ class MyRadio extends HTMLElement {
         shadow.appendChild(this._input);
         shadow.appendChild(label);
 
-        // Styling
-        const style = document.createElement('style');
-        style.textContent = `
-        label {
-          display: inline-block;
-          padding: 10px;
-          background-color: #f0f0f0;
-          border: 2px solid #d0d0d0;
-          border-radius: 50%;
-          cursor: pointer;
-          transition: background-color 0.3s, border-color 0.3s;
-        }
-        label:hover {
-          background-color: #e0e0e0;
-        }
-        input[type="radio"]:checked + label {
-          background-color: #a0e0a0;
-          border-color: #70c070;
-        }
-      `;
 
         // Append the style to the shadow root
-        shadow.appendChild(style);
+        shadow.adoptedStyleSheets = [sharedStyles];
 
         // Event listener
         this.addEventListener('click', () => {

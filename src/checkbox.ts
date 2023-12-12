@@ -1,3 +1,25 @@
+const sharedStyles = new CSSStyleSheet();
+sharedStyles.replaceSync(`
+label {
+    /* Example Styling */
+    display: inline-block;
+    padding: 10px;
+    background-color: #eee;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  label:hover {
+    background-color: #dcdcdc;
+  }
+  input[type="checkbox"]:checked + label {
+    background-color: #bada55;
+    border-color: #a5a5a5;
+  }
+`)
+
+
+
 class MyCheckbox extends HTMLElement {
     static formAssociated = true; // Explicitly mark as form-associated
 
@@ -6,7 +28,7 @@ class MyCheckbox extends HTMLElement {
         this._internals = this.attachInternals();
 
         // Attach a shadow root to the custom element
-        const shadow = this.attachShadow({ mode: 'open' });
+        const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
         // Create and append the internal checkbox input
         const input = document.createElement('input');
@@ -22,29 +44,8 @@ class MyCheckbox extends HTMLElement {
         shadow.appendChild(input);
         shadow.appendChild(label);
 
-        // Styling
-        const style = document.createElement('style');
-        style.textContent = `
-          label {
-            /* Example Styling */
-            display: inline-block;
-            padding: 10px;
-            background-color: #eee;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            cursor: pointer;
-          }
-          label:hover {
-            background-color: #dcdcdc;
-          }
-          input[type="checkbox"]:checked + label {
-            background-color: #bada55;
-            border-color: #a5a5a5;
-          }
-        `;
-
         // Append style to the shadow root
-        shadow.appendChild(style);
+        shadow.adoptedStyleSheets = [sharedStyles];
 
         this._input = input;
         this._label = label;
