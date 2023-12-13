@@ -22,6 +22,7 @@ class MyTextarea extends HTMLElement {
   constructor() {
     super();
     this._internals = this.attachInternals();
+    this._internals.role = 'textbox'; // Accessibility: Role as textbox
 
     const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
@@ -58,8 +59,35 @@ class MyTextarea extends HTMLElement {
     this._internals.setFormValue(val);
   }
 
+  get readOnly() {
+    return this.hasAttribute('readonly');
+  }
+
+  set readOnly(val) {
+    if (val) {
+      this.setAttribute('readonly', '');
+      this._textarea.readOnly = true;
+    } else {
+      this.removeAttribute('readonly');
+      this._textarea.readOnly = false;
+    }
+  }
+
+  get disabled() {
+    return this.hasAttribute('disabled');
+}
+
+set disabled(value) {
+    const isDisabled = Boolean(value);
+    this._textarea.disabled = isDisabled;
+    this.toggleAttribute('disabled', isDisabled);
+
+    // Update ARIA disabled attribute
+    this._textarea.ariaDisabled = isDisabled ? 'true' : 'false';
+}
+
   static get observedAttributes() {
-    return ['value', 'name', 'disabled'];
+    return ['value', 'name', 'disabled','readonly'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -69,7 +97,10 @@ class MyTextarea extends HTMLElement {
       this._textarea.name = newValue;
     } else if (name === 'disabled') {
       this._textarea.disabled = this.hasAttribute('disabled');
+    } else if (name === 'readonly') {
+      this._textarea.readOnly = this.hasAttribute('readonly');
     }
+  
   }
 
   connectedCallback() {

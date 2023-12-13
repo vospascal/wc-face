@@ -21,6 +21,7 @@ class MyTextInput extends HTMLElement {
     constructor() {
         super();
         this._internals = this.attachInternals();
+        this._internals.role = 'textbox'; // Accessibility: Role as textbox
 
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
 
@@ -58,8 +59,36 @@ class MyTextInput extends HTMLElement {
         this._internals.setFormValue(val);
     }
 
+    get readOnly() {
+        return this.hasAttribute('readonly');
+      }
+    
+      set readOnly(val) {
+        if (val) {
+          this.setAttribute('readonly', '');
+          this._input.readOnly = true;
+        } else {
+          this.removeAttribute('readonly');
+          this._input.readOnly = false;
+        }
+      }
+
+
+    get disabled() {
+        return this.hasAttribute('disabled');
+    }
+
+    set disabled(value) {
+        const isDisabled = Boolean(value);
+        this._input.disabled = isDisabled;
+        this.toggleAttribute('disabled', isDisabled);
+
+        // Update ARIA disabled attribute
+        this._internals.ariaDisabled = isDisabled ? 'true' : 'false';
+    }
+
     static get observedAttributes() {
-        return ['value', 'name', 'disabled'];
+        return ['value', 'name', 'disabled', 'readonly'];
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -69,7 +98,9 @@ class MyTextInput extends HTMLElement {
             this._input.name = newValue;
         } else if (name === 'disabled') {
             this._input.disabled = this.hasAttribute('disabled');
-        }
+        }else if (name === 'readonly') {
+            this._input.readOnly = this.hasAttribute('readonly');
+          }
     }
 
     connectedCallback() {

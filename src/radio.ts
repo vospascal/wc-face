@@ -24,6 +24,8 @@ class MyRadio extends HTMLElement {
     constructor() {
         super();
         this._internals = this.attachInternals();
+        this._internals.role = 'radio'; // Set ARIA role
+        this._internals.ariaChecked = 'false'; // Initial ARIA checked state
 
         // Shadow DOM attachment
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
@@ -63,6 +65,9 @@ class MyRadio extends HTMLElement {
         }
         this._input.checked = isChecked;
         this.toggleAttribute('checked', isChecked);
+
+        // Update ARIA checked attribute
+        this._internals.ariaChecked = isChecked ? 'true' : 'false';
     }
 
     uncheckOtherRadiosInGroup() {
@@ -101,6 +106,9 @@ class MyRadio extends HTMLElement {
         const isDisabled = Boolean(value);
         this._input.disabled = isDisabled;
         this.toggleAttribute('disabled', isDisabled);
+
+        // Update ARIA disabled attribute
+        this._internals.ariaDisabled = isDisabled ? 'true' : 'false';
     }
 
     // Optionally, to observe attribute changes

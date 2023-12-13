@@ -26,6 +26,9 @@ class MyCheckbox extends HTMLElement {
     constructor() {
         super();
         this._internals = this.attachInternals();
+        this._internals.role = 'checkbox'; // Set ARIA role
+        this._internals.ariaChecked = 'false'; // Initial ARIA checked state
+
 
         // Attach a shadow root to the custom element
         const shadow = this.attachShadow({ mode: 'open', delegatesFocus: true });
@@ -63,6 +66,9 @@ class MyCheckbox extends HTMLElement {
         const isChecked = Boolean(value);
         this._input.checked = isChecked;
         this.toggleAttribute('checked', isChecked);
+
+        // Update ARIA checked attribute
+        this._internals.ariaChecked = isChecked ? 'true' : 'false';
     }
 
     get name() {
@@ -81,9 +87,22 @@ class MyCheckbox extends HTMLElement {
         this.setAttribute('value', val);
     }
 
+    get disabled() {
+        return this.hasAttribute('disabled');
+    }
+
+    set disabled(value) {
+        const isDisabled = Boolean(value);
+        this._input.disabled = isDisabled;
+        this.toggleAttribute('disabled', isDisabled);
+
+        // Update ARIA disabled attribute
+        this._internals.ariaDisabled = isDisabled ? 'true' : 'false';
+    }
+
     // Optionally, if you want to observe attribute changes
     static get observedAttributes() {
-        return ['checked'];
+        return ['value', 'name', 'disabled', 'readonly'];
     }
 
     connectedCallback() {
